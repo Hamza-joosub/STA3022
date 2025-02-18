@@ -78,5 +78,23 @@ step(model2, test="F")
 model3 = lm(scale(shareprice) ~ scale(turnover)+scale(leverage)+scale(sectorInsurance)+scale(sectorLeisure)+scale(companysizeMedium)+scale(companysizeSmall), data = df_with_dummies)
 summary(model3)
 ```
+## Prediction
+```{r}
+# Example new data
+new_data <- data.frame(
+  turnover = c(400, 500, 600),  # example turnover values
+  leverage = c(1.5, 1.6, 1.7)   # example leverage values
+)
+# Assuming 'model' is your previously fitted model
+predictions <- predict(model1, newdata = new_data)
+
+# Print the predictions
+print(predictions)
+```
+
+
+
+
+
 
 
