@@ -1,0 +1,82 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Histogram Of Share prices
+
+```{r}
+hist(Tut1_shareprices$shareprice, main = "Histogram Of Share Prices", xlab = "Share Prices", col = "blue", border = "white")
+```
+
+## Test for Normality
+
+```{r}
+shapiro_test_result = shapiro.test(Tut1_shareprices$shareprice)
+shapiro_test_result
+```
+
+We can conclude the data in normally Distributed
+
+## Linear Model with No Categorical Variables and Unscaled
+
+```{r}
+model1 = lm(Tut1_shareprices$shareprice ~ Tut1_shareprices$turnover+Tut1_shareprices$leverage)
+summary(model1)
+```
+
+The model explains 43% of the variance in share price using turnover and leverage. The Model is significant. Residuals look to be normally distributed we can see leverage is not a significant variable in the model bu rather turnover
+
+## Handling Categorical variables
+
+#### convert categorical variable to a factor
+
+```{r}
+Tut1_shareprices$sector = factor(Tut1_shareprices$sector)
+```
+
+#### Creating Dummy Variables
+
+Create dummy variables for the categorical columns 'sector' and 'companysize'
+
+```{r}
+dummies_sector = model.matrix(~ sector, data=Tut1_shareprices)
+dummies_sector = dummies_sector[,-1]
+dummies_sector
+dummies_size = model.matrix(~ companysize, data=Tut1_shareprices)
+dummies_size = dummies_size[,-1]
+dummies_size
+```
+
+#### adding dummy variables to dataframe
+
+```{r}
+df_with_dummies = Tut1_shareprices 
+df_with_dummies = cbind(Tut1_shareprices,dummies_sector)
+df_with_dummies = cbind(df_with_dummies, dummies_size)
+df_with_dummies
+```
+
+## Linear Models with Categorical variables
+
+```{r}
+model2 = lm(shareprice ~ turnover+leverage+sectorInsurance+sectorLeisure+companysizeMedium+companysizeSmall, data = df_with_dummies)
+summary(model2)
+```
+
+we can see the model explains 82% of the variation in Shareprice. the model is significant in reducing unexplained variation. leverage is the only non significant variable. The smaller the company the higher the shareprice or a medium size results in an increase in shareprice of 116 and 131 for small companies. 
+## StepWise Backwards Regression
+```{r}
+step(model2,direction = 'backward', test="F")
+```
+## StepWise Forwards Regression
+```{r}
+step(model2, test="F")
+```
+## Scaled Linear Model
+```{r}
+model3 = lm(scale(shareprice) ~ scale(turnover)+scale(leverage)+scale(sectorInsurance)+scale(sectorLeisure)+scale(companysizeMedium)+scale(companysizeSmall), data = df_with_dummies)
+summary(model3)
+```
+
+
